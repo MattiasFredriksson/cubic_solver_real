@@ -1,6 +1,6 @@
 # Algorithm for computing real roots of cubic and quartic equations
 
-C++ implementation of Cardano's method for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). Code is based on https://github.com/tatwood/solvecubic but has been adapted/optimized to reduce the MAE (mean absolute error) for computing roots in 64-bit precision. The goal was not to find an optimal algorithm but an iteration with reasonable performance/accurracy.
+C++ implementation of [Cardano's method](https://en.wikipedia.org/wiki/Cubic_equation#Cardano's_formula) for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). Code is based on https://github.com/tatwood/solvecubic but has been adapted/optimized to reduce the MAE (mean absolute error) for computing roots in 64-bit precision. The goal was not to find an optimal algorithm but an iteration with reasonable performance/accurracy.
 
 
 ## Comparison to Numpy.roots()
