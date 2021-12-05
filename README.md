@@ -11,6 +11,9 @@ Each test consists of 1E6 cases with coefficients generated from a uniform distr
 ### Cubic equation
 
 #### Coefficients uniformly drawn in the range [1e-0, 1e0)
+
+Algo. | Test No. | MAE | Std | Max 
+--- | --- | --- | --- | --- 
 Cubic | 0 | 0.0000000000194537 | 0.0000000106754163 | 0.0000115097497277
 Numpy | 0 | 0.0000000000293169 | 0.0000000169255077 | 0.0000190077410858
 Cubic | 1 | 0.0000000001275928 | 0.0000000821719994 | 0.0000895105459200
@@ -34,6 +37,9 @@ Numpy | 2 | 0.0001902332604939 | 0.2269926509587637 | 271.8742242266598623
 ### Quadratic equation
 
 #### Coefficients uniformly drawn in the range [1e-0, 1e0)
+
+Algo. | Test No. | MAE | Std | Max 
+--- | --- | --- | --- | --- 
 Quadratic | 0 | 0.0000000000000003 | 0.0000000000000319 | 0.0000000000316736
 Numpy | 0 | 0.0000000000000004 | 0.0000000000000322 | 0.0000000000316736
 Quadratic | 1 | 0.0000000000000004 | 0.0000000000000597 | 0.0000000000634905
