@@ -62,8 +62,9 @@ Numpy | 2 | 0.0000000000490860 | 0.0000000126699302 | 0.0000133562862175
 
 ## Changes to original work
 
-  - Reduced the form to x^3 + bx^2 + cx + d (or  x^2 + bx + c).
+  - Utilized https://people.csail.mit.edu/bkph/articles/Quadratics.pdf for computing quadratic roots.
+  - Reduced the form to x^3 + bx^2 + cx + d.
+  - Equation reordering to favor computation of mult./division before addition/subtraction.
   - Increased precision of constant varibles.
   - Computed cubic roots using std::cbrt.
-  - Equation reordering to favor computation of mult./division before addition/subtraction.
   - ...
