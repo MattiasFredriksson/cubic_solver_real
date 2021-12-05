@@ -6,7 +6,7 @@ C++ implementation of Cardano's method for computing real roots of a cubic or qu
 ## Comparison to Numpy.roots()
 
 Absolute error is computed as e = |f(x_r)| where f(x) is the polynomial function and x_r is any real root computed for f(x) = 0.
-Each test consists of 1E6 cases with coefficients generated from a uniform distribution with fixed seed. Tests are repeated three times, and the error is computed for both algorithms (provided and numpy). Note that the number of roots is dependent on the generated coefficients. Outcome will be hardware/software dependent.
+Each test consists of 1E6 cases with coefficients generated from a uniform distribution with fixed seed. Tests are repeated three times, and the error is computed from the same coefficients for both algorithms (provided and numpy). Note that the number of roots is dependent on the generated coefficients. Outcome will be hardware/software dependent.
 
 ### Cubic equation
 
