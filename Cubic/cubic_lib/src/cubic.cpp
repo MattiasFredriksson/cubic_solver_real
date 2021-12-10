@@ -102,7 +102,7 @@ template int quadratic_roots(double a, double b, double c, double* xout);
 template int quadratic_roots(float a, float b, float c, float* xout);
 
 /**
- * Implementation of Cardano's method for solving cubic equations.
+ * Implementation uses both the trignometric and Cardano's method method for solving cubic equations.
  *
  * Implementation is based on https://github.com/tatwood/solvecubic
  * @author	  Thomas Atwood (original), Mattias Fredriksson (modified)
