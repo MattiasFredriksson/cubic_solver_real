@@ -1,11 +1,10 @@
-# Algorithm for computing real roots of cubic and quartic equations
+# Cubic and quartic real root finder
 
-C++ implementation of [Cardano's method](https://en.wikipedia.org/wiki/Cubic_equation#Cardano's_formula) for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). Code is based on https://github.com/tatwood/solvecubic but has been adapted/optimized to reduce the MAE (mean absolute error) for computing roots in 64-bit precision. The goal was not to find an optimal algorithm but an iteration with reasonable performance/accurracy.
-
+C++ implementation for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). [Src code](https://github.com/MattiasFredriksson/cubic_solver_real/blob/master/Cubic/cubic_lib/src/cubic.cpp) is loosely based on https://github.com/tatwood/solvecubic but adapted/optimized to reduce MAE (mean absolute error) and runtime for computing roots in 64-bit precision. 
 
 ## Comparison to Numpy.roots()
 
-Tests are evaluated over 1E6 polynomial functions with coefficients sampled from a uniform distribution with fixed seed. Each test is repeated three times and error statistics is computed based on evaluation of the same coefficients for both algorithms (implemented and numpy). Note that the number of roots is dependent on the generated coefficients. Outcome will be hardware/software dependent.
+Tests consist of 1E6 polynomial functions with coefficients sampled from a uniform distribution with fixed seed. Each test is repeated three times and statistics is computed by evaluating both algorithms on the same coefficients. Outcome will be hardware/software dependent.
 
 Absolute error is computed as e = |f(x_r)| where f(x) is the polynomial function and x_r is any real root computed for f(x) = 0.
 
@@ -15,24 +14,24 @@ Absolute error is computed as e = |f(x_r)| where f(x) is the polynomial function
 
 Algo. | Test No. | MAE | Std | Max 
 --- | --- | --- | --- | --- 
-Cubic | 0 | 0.0000000000194537 | 0.0000000106754163 | 0.0000115097497277
-Numpy | 0 | 0.0000000000293169 | 0.0000000169255077 | 0.0000190077410858
-Cubic | 1 | 0.0000000001275928 | 0.0000000821719994 | 0.0000895105459200
-Numpy | 1 | 0.0000000003381824 | 0.0000002904316352 | 0.0003336512873353
-Cubic | 2 | 0.0000000018836243 | 0.0000022526917021 | 0.0026981010554332
-Numpy | 2 | 0.0000000018860261 | 0.0000022526918885 | 0.0026981010554332
+Cubic | 0 |  0.0000000000199807 | 0.0000000105674862 | 0.0000115097497277
+Numpy | 0 |  0.0000000000293169 | 0.0000000169255077 | 0.0000190077410858
+Cubic  | 1 |  0.0000000001029146 | 0.0000000763570113 | 0.0000895105459200
+Numpy  | 1 |  0.0000000003381824 | 0.0000002904316352 | 0.0003336512873353
+Cubic  | 2 |  0.0000000018835925 | 0.0000022526917038 | 0.0026981010554332
+Numpy  | 2 |  0.0000000018860261 | 0.0000022526918885 | 0.0026981010554332
 
 
 #### Coefficients uniformly drawn in the range [1e-5, 1e5)
 
 Algo. | Test No. | MAE | Std | Max 
 --- | --- | --- | --- | --- 
-Cubic | 0 | 0.0000008797588691 | 0.0003392194251384 | 0.3089626386645250
-Numpy | 0 | 0.0000042240897500 | 0.0028116804269617 | 3.1311602018395206
-Cubic | 1 | 0.0000076777322966 | 0.0051610936175355 | 4.7461626961303409
-Numpy | 1 | 0.0000237523910556 | 0.0185939038980810 | 20.7461779549194034
-Cubic | 2 | 0.0001678451622521 | 0.2004852253007057 | 240.1257147381838877
-Numpy | 2 | 0.0001902332604939 | 0.2269926509587637 | 271.8742242266598623
+Cubic  | 0 |  0.0000007717178477 | 0.0002363548283299 | 0.1472778703464428
+Numpy  | 0 | 0.0000042240897500 | 0.0028116804269617 | 3.1311602018395206
+Cubic  | 1 |  0.0000072913011206 | 0.0051505376408809 | 4.7461626961303409
+Numpy  |  1 | 0.0000237523910556 | 0.0185939038980810 | 20.7461779549194034
+Cubic  | 2 |  0.0001678360884921 | 0.2004852254811660 | 240.1257147381838877
+Numpy  | 2 |  0.0001902332604939 | 0.2269926509587637 | 271.8742242266598623
 
 
 ### Quadratic equation
@@ -59,12 +58,3 @@ Quadratic | 1 | 0.0000000000345022 | 0.0000000021549128 | 0.0000013075477909
 Numpy | 1 | 0.0000000000368232 | 0.0000000023601247 | 0.0000013075477909
 Quadratic | 2 | 0.0000000000453204 | 0.0000000124810741 | 0.0000133562862175
 Numpy | 2 | 0.0000000000490860 | 0.0000000126699302 | 0.0000133562862175
-
-## Changes to original work
-
-  - Utilized https://people.csail.mit.edu/bkph/articles/Quadratics.pdf for computing quadratic roots.
-  - Reduced the form to x^3 + bx^2 + cx + d.
-  - Equation reordering to favor computation of mult./division before addition/subtraction.
-  - Increased precision of constant varibles.
-  - Computed cubic roots using std::cbrt.
-  - Templats...
