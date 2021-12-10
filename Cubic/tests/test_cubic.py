@@ -53,14 +53,6 @@ def run_algo_comparison(max=1e5, N=10000, N_runs=1, seed=5098359162415):
             croots, csum = cubic_solve(A)
             nproots, npsum = numpy_solve(A)
                 
-            # Check for double root
-            if len(croots) == 2:
-                print("%i:th is double root %s for the cubic polynom %s, sum was%s" % (i, str(croots), str(A), str(csum)))
-                if not is_root(csum):
-                    print("%i:th failed %s is not an exact root to the cubic polynom %s, sum was %s" % (i, str(croots), str(A), str(csum)))
-                if not is_root(csum):
-                    print("Numpy %i:th failed %s is not an exact root to the cubic polynom %s, sum was %s" % (i, str(nproots), str(A), str(npsum)))
-                        
             # Sanity check
             if len(croots) != len(nproots):
                 print("Mismatch in number of roots for polynom %s | Out: %s | Ans: %s" % (str(A), str(croots), str(nproots)))

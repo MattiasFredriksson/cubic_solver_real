@@ -39,7 +39,6 @@ static void test_cubic_zero_double() {
 */
 static void test_quadratic_zero_double() {
 	double out[2];
-	double val;
 	int N;
 
 	/* Linear*/

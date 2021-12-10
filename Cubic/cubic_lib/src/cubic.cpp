@@ -117,6 +117,8 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 	constexpr FP sin120 = (FP)0.8660254037844386467637231707529361834714026269051903140279034897;
 	constexpr FP PI = (FP)3.141592653589793238462643383279502884197169399375105820974944592307816406286;
 	constexpr FP PIHalf = PI / 2.0;
+	constexpr FP PI2 = PI * 2.0;
+	constexpr FP PI2over3 = PI * 2.0 / 3.0;
 	constexpr FP third = (FP)(1.0 / 3.0);
 	constexpr FP zero = (FP)0.0;
 	constexpr FP EPSILON = is_same<float, typename remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
@@ -147,70 +149,43 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 		d = d / a;
 		a = (FP)1.0;
 
-		/* p / 27 and b / 27 may improve precision slightly. */
-
 		FP bover3 = b * third;
 		FP p = c - bover3 * b;
-		FP pover3 = p * third;
-		FP halfq = bover3 * bover3 * bover3 - (FP)(0.5) * bover3 * c + (FP)(0.5) * d;
-		FP yy = pover3 * pover3 * pover3 + halfq * halfq;
-		if (yy > EPSILON)
+		FP halfq = bover3 * bover3 * bover3 - (FP)0.5 * bover3 * c + (FP)0.5 * d;
+		FP yy = p / (FP)27.0 * p * p + halfq * halfq;
+
+		if (yy < (FP)0.0) /* Sqrt is negative: three real solutions */
 		{
-			/*  Sqrt is positive: one real solution */
-			FP y = sqrt(yy);
-			FP uuu = -halfq + y;
-			FP vvv = -halfq - y;
-			FP www = abs(uuu) > abs(vvv) ? uuu : vvv;
-			FP w = (www < zero) ? -cbrt(abs(www)) : cbrt(www);
-			*xout = w - pover3 / w - bover3;
-			n = 1;
-		}
-		else if (yy < -EPSILON)
-		{
-			/* Sqrt is negative: three real solutions */
-			FP x = -halfq;
-			FP y = sqrt(-yy);
-			FP theta;
-			FP r;
-			FP ux;
-			FP uyi;
-			/* Convert to polar form */
-			if (abs(x) > EPSILON)
+			n = 3;
+			if (fabs(p) < EPSILON)
 			{
-				theta = atan(y / x);
-				r = sqrt(x * x - yy);
-				theta = (x > zero) ? theta : (theta + PI);
+				xout[0] = -bover3;
+				xout[1] = xout[0];
+				xout[2] = xout[0];
 			}
 			else
 			{
-				/* Vertical line */
-				theta = PIHalf;
-				r = y;
+				FP uu = (FP)(-4.0 / 3.0) * p;
+				FP u = sqrt(uu);
+				FP theta = acos((FP)-8.0 * halfq / (u * uu)) * third;
+				xout[0] = u * cos(theta) - bover3;
+				xout[1] = u * cos(theta - PI2over3) - bover3;
+				xout[2] = u * cos(theta + PI2over3) - bover3;
 			}
-			/* Calc. cube root */
-			theta *= third;
-			r = cbrt(r);
-			/* Convert to complex coordinate */
-			ux = cos(theta) * r;
-			uyi = sin(theta) * r;
-			/* First solution */
-			xout[0] = ux + ux - bover3;
-			/* Second solution, rotate +120 degrees */
-			xout[1] = (FP)2.0 * (ux * cos120 - uyi * sin120) - bover3;
-			/* Third solution, rotate -120 degrees */
-			xout[2] = (FP)2.0 * (ux * cos120 + uyi * sin120) - bover3;
-			n = 3;
 		}
 		else
 		{
-			/* Sqrt is zero: two real solutions. Not occuring if all coefficients are real, exception would be due to the occurance of rounding errors (possible?, more likely for 32bit precision?). */
-			FP w = (halfq > zero) ? -cbrt(halfq) : cbrt(-halfq);
-			/* First solution */
-			xout[0] = w + w - bover3;
-			/* Second solution, rotate +120 degrees */
-			xout[1] = (FP)2.0 * w * cos120 - bover3;
-			n = 2;
+			/*  Sqrt is positive: one real solution */
+			FP y = sqrt(yy);
+			FP uuu = y - halfq;
+			FP vvv = -y - halfq;
+			FP www = abs(uuu) > abs(vvv) ? uuu : vvv;
+			FP w = copysign(cbrt(abs(www)), www);
+			*xout = w - p / ((FP)3.0 * w) - bover3;
+			n = 1;
+			return n;
 		}
+		return n;
 	}
 
 	return n;
