@@ -1,6 +1,6 @@
 # Cubic and quartic real root finder
 
-C++ implementation for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). Code is loosely based on https://github.com/tatwood/solvecubic but adapted/optimized to reduce MAE (mean absolute error) and runtime for computing roots in 64-bit precision. 
+C++ implementation for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). (Code)[https://github.com/MattiasFredriksson/cubic_solver_real/blob/master/Cubic/cubic_lib/src/cubic.cpp] is loosely based on https://github.com/tatwood/solvecubic but adapted/optimized to reduce MAE (mean absolute error) and runtime for computing roots in 64-bit precision. 
 
 ## Comparison to Numpy.roots()
 
