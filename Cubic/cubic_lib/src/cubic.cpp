@@ -51,11 +51,11 @@ template float cubic(float a, float b, float c, float d, float x);
 * Find the roots to the quadratic equation
 *	f(x) = ax^2 + bx + c
 *
+* Implementation is based on https://people.csail.mit.edu/bkph/articles/Quadratics.pdf.
 */
 template<typename FP>
 int quadratic_roots(FP a, FP b, FP c, FP* xout) {
 	using namespace std;
-	constexpr FP half = (FP)0.5;
 	constexpr FP EPSILON = is_same<float, typename remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
 
 	if (abs(a) < EPSILON)
@@ -71,8 +71,8 @@ int quadratic_roots(FP a, FP b, FP c, FP* xout) {
 	{
 		/* Quadratic equation
 
-		Implementation is based on https://people.csail.mit.edu/bkph/articles/Quadratics.pdf.
-		The root combination is swapped however as the one in the paper performed far worse on MAE tests.
+		Based on https://people.csail.mit.edu/bkph/articles/Quadratics.pdf.
+		The combination is swapped as the combination described in the paper performed far worse on MAE tests.
 		*/
 
 		/* Reduce form through division, multiplication of '1.0 / a' has a significant precision cost. */
@@ -80,18 +80,18 @@ int quadratic_roots(FP a, FP b, FP c, FP* xout) {
 		b = b / a;
 		c = c / a;
 
-		FP yy = b * b - (FP)4.0 * c;
-		if (yy >= (FP)0.0)
+		FP q = b * b - (FP)4.0 * c;
+		if (q >= (FP)0.0)
 		{
 			FP c2 = (FP)2.0 * c;
-			FP y = sqrt(yy);
+			q = sqrt(q);
 			if (b < (FP)0.0) {
-				xout[0] = c2 / (y - b);
-				xout[1] = (y - b) * half;
+				xout[0] = c2 / (q - b);
+				xout[1] = (q - b) * (FP)0.5;
 			}
 			else {
-				xout[0] = (-b - y) * half;
-				xout[1] = c2 / (-y - b);
+				xout[0] = (-b - q) * (FP)0.5;
+				xout[1] = c2 / (-q - b);
 			}
 			return 2;
 		}
@@ -105,7 +105,7 @@ template int quadratic_roots(float a, float b, float c, float* xout);
  * Implementation uses both the trignometric and Cardano's method method for solving cubic equations.
  *
  * Implementation is based on https://github.com/tatwood/solvecubic
- * @author	  Thomas Atwood (original), Mattias Fredriksson (modified)
+ * @author	  Thomas Atwood (original author), Mattias Fredriksson (optimized)
  * @date      2011 (cloned Nov 2021)
  * @copyright unlicense / public domain
  ****************************************************************************/
@@ -113,12 +113,10 @@ template<typename FP>
 int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 {
 	using namespace std;
-	constexpr FP cos120 = (FP)-0.5;
-	constexpr FP sin120 = (FP)0.8660254037844386467637231707529361834714026269051903140279034897;
 	constexpr FP PI = (FP)3.141592653589793238462643383279502884197169399375105820974944592307816406286;
-	constexpr FP PIHalf = PI / 2.0;
-	constexpr FP PI2 = PI * 2.0;
-	constexpr FP PI2over3 = PI * 2.0 / 3.0;
+	constexpr FP PIHalf = (FP)(PI / 2.0);
+	constexpr FP PI2 = (FP)(PI * 2.0);
+	constexpr FP PI2over3 = (FP)(PI * 2.0 / 3.0);
 	constexpr FP third = (FP)(1.0 / 3.0);
 	constexpr FP zero = (FP)0.0;
 	constexpr FP EPSILON = is_same<float, typename remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
@@ -147,7 +145,7 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 		b = b / a;
 		c = c / a;
 		d = d / a;
-		a = (FP)1.0;
+		//a = (FP)1.0;
 
 		FP bover3 = b * third;
 		FP p = c - bover3 * b;
@@ -192,3 +190,139 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 }
 template int cubic_roots(double a, double b, double c, double d, double* xout);
 template int cubic_roots(float a, float b, float c, float d, float* xout);
+
+
+/**
+* Find the roots to the quadratic equation
+*	f(x) = ax^2 + bx + c
+*
+* Implementation is based on https://people.eecs.berkeley.edu/~wkahan/Math128/Cubic.pdf.
+* 'To Solve a Real Cubic Equation' authored by W. Kahan.
+* 
+* Note* implementation only return real roots and checks if the equation is linear.
+*/
+template<typename FP>
+inline int qdrtc(FP A, FP B, FP C, FP* xout)
+{
+	constexpr FP EPSILON = std::is_same<float, typename std::remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
+
+	if (std::abs(A) < EPSILON)
+	{
+		/* Linear equation */
+		if (std::abs(B) > EPSILON)
+		{
+			*xout = -C / B;
+			return 1;
+		}
+		/* Constant*/
+		return 0;
+	}
+
+	FP b = -B / (FP)2.0;
+	FP q = b * b - A * C;
+	if (q < (FP)0.0) {
+		return 0;
+		/* Complex roots
+		X1 = b / A;
+		X2 = X1;
+		Y1 = std::sqrt(-q) / A;
+		Y2 = -Y1;
+		*/
+	}
+	else {
+		FP r = b + std::copysign(std::sqrt(q), b); /* sqrt(q) * sign(b) as q >= 0 */
+		if (r == (FP)0.0) {
+
+			xout[0] = C / A;
+			xout[1] = -xout[0];
+		}
+		else {
+			xout[0] = C / r;
+			xout[1] = r / A;
+		}
+	}
+	return 2;
+}
+
+
+template<typename FP>
+inline void qbc_eval(FP X, FP A, FP B, FP C, FP D, FP& Q, FP& Q_p, FP& B1, FP& C2)
+{
+	FP q0 = A * X;
+	B1 = q0 + B;
+	C2 = B1 * X + C;
+	Q_p = (q0 + B1) * X + C2;
+	Q = C2 * X + D;
+}
+
+/**
+ * Compute the real roots for the cubic equation
+ *
+ *		ax^3 + bx^2 + cx + d = 0
+ *
+ * Implementation is based on https://people.eecs.berkeley.edu/~wkahan/Math128/Cubic.pdf.
+ * 'To Solve a Real Cubic Equation' authored by W. Kahan.
+ * 
+ * Note* implementation only return real roots and checks if the equation is linear.
+ */
+template<typename FP>
+int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xout) {
+	using namespace std;
+	constexpr FP EPSILON = is_same<float, typename remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
+
+	int N = 0;
+	FP b1, c2;
+	if (abs(A) < EPSILON) {
+		/* Quadratic equation */
+		A = B;
+		b1 = C;
+		c2 = D;
+		// *xout++ == INFINITY;
+	}
+	else if (abs(D) < EPSILON) {
+		/* Convert to a quadratic equation (divide by x) */
+		*xout++ = (FP)0.0;
+		b1 = B;
+		c2 = C;
+		N = 1;
+	}
+	else {
+		FP X = -(B / A) / (FP)3.0;
+		FP q, q_p, t, r, s;
+		qbc_eval(X, A, B, C, D, q, q_p, b1, c2);
+
+		t = q / A;
+		r = std::cbrt(std::abs(t));
+		s = std::copysign((FP)1.0, t);
+
+		t = -q_p / A;
+		if (t > 0) {
+			r = (FP)1.324717957244746025960908854478097340734404056901733365 * std::fmax(r, std::sqrt(t));
+		}
+
+		FP x0 = X - r * s;
+		if (x0 != X) {
+			int i = 0;
+			do {
+				X = x0;
+				qbc_eval(X, A, B, C, D, q, q_p, b1, c2);
+				if (q_p == 0) {
+					x0 = X;
+				}
+				else {
+					x0 = X - (q / q_p) / (FP)1.000000000000001; /* 1.000..001 */
+				}
+			} while (x0 * s > X * s);
+
+			if (std::abs(A) * X * X > std::abs(D / X)) {
+				c2 = -D / X;
+				b1 = (c2 - C) / X;
+			}
+		}
+		N = 1;
+		*xout++ = X;
+	}
+	return N + qdrtc(A, b1, c2, xout);
+}
+template int cubic_roots_qbc(double a, double b, double c, double d, double* xout);
+template int cubic_roots_qbc(float a, float b, float c, float d, float* xout);

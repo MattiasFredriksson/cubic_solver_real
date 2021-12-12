@@ -4,6 +4,12 @@
 * Provided under the Unlicense License (public domain, see license terms at http://unlicense.org/).
 */
 
+
+template<typename FP>
+using QDRT_SOLVER = int (*)(FP, FP, FP, FP*);
+template<typename FP>
+using CBRT_SOLVER = int (*)(FP, FP, FP, FP, FP*);
+
 /**
 * Evaluate the quadratic function for a given x.
 *
@@ -37,3 +43,20 @@ int quadratic_roots(FP a, FP b, FP c, FP* xout);
  */
 template<typename FP>
 int cubic_roots(FP a, FP b, FP c, FP d, FP* xout);
+
+
+/**
+* Compute the real roots for the quadratic equation
+*
+*		ax^2 + bx + c = 0
+*/
+template<typename FP>
+int qdrtc(FP A, FP B, FP C, FP* xout);
+
+/**
+ * Compute the real roots for the cubic equation
+ *
+ *		ax^3 + bx^2 + cx + d = 0
+ */
+template<typename FP>
+int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xout);

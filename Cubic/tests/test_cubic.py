@@ -19,6 +19,13 @@ def cubic_solve(A):
     roots = np.sort(roots)
     return roots, cubic_sum(A, roots)
 
+def cubic_qbc_solve(A):
+    """
+    """
+    roots = cubic.cubic_roots_qbc(*A)
+    roots = np.sort(roots)
+    return roots, cubic_sum(A, roots)
+
 def numpy_solve(A):
     """
     """
@@ -48,25 +55,55 @@ def run_algo_comparison(max=1e5, N=10000, N_runs=1, seed=5098359162415):
     iter = 0
     while (iter < N_runs):
         polys = rng.uniform(-max, max, (N, 4))
-        csums, npsums = [], []
+        csums, qbcsums, npsums = [], [], []
         for i, A in enumerate(polys):
             croots, csum = cubic_solve(A)
+            qbcroots, qbcsum = cubic_qbc_solve(A)
             nproots, npsum = numpy_solve(A)
                 
             # Sanity check
             if len(croots) != len(nproots):
-                print("Mismatch in number of roots for polynom %s | Out: %s | Ans: %s" % (str(A), str(croots), str(nproots)))
+                print("'cubic': Mismatch in number of roots for polynom %s | Out: %s | Ans: %s" % (str(A), str(croots), str(nproots)))
+            if len(qbcroots) != len(nproots):
+                print("'qbc': Mismatch in number of roots for polynom %s | Out: %s | Ans: %s" % (str(A), str(croots), str(nproots)))
 
             csums.extend(csum)
+            qbcsums.extend(qbcsum)
             npsums.extend(npsum)
 
         acsums = np.abs(csums)
+        aqbcsums = np.abs(qbcsums)
         anpsums = np.abs(npsums)
         print("Algorithm comparison | Run %i | N %i | Max %.2E:" % (iter, N, max))
         # Mean absolute error
         print("Cubic solver | MAE: %0.16f | MAE Std: %0.16f | EMax: %0.16f" % (np.mean(acsums), np.std(acsums), np.max(acsums)))
+        print("QBC solver | MAE: %0.16f | MAE Std: %0.16f | EMax: %0.16f" % (np.mean(aqbcsums), np.std(aqbcsums), np.max(aqbcsums)))
         print("Numpy solver | MAE: %0.16f | MAE Std: %0.16f | EMax: %0.16f" % (np.mean(anpsums), np.std(anpsums), np.max(anpsums)))
         iter += 1
+
+        
+
+def verif_cbrt_solver_uniform(cbrt_solver, N=100000):
+    rng = np.random.default_rng(5098359162415)
+
+
+    polys = rng.uniform(-1e0, 1e0, (N, 4))
+    csums, npsums = [], []
+    for i, A in enumerate(polys):
+        croots, csum = cbrt_solver(A)
+        nproots, npsum = numpy_solve(A)
+                   
+        assert np.allclose(nproots, croots), \
+            "%i:th failed for polynom %s | Out: %s | Ans: %s" % (i, str(A), str(croots), str(nproots))
+
+        csums.extend(csum)
+        npsums.extend(npsum)
+
+    acsums = np.abs(csums)
+    anpsums = np.abs(npsums)
+    print("Uniform results:")
+    print("Cubic solver | MAE: %0.16f MAE | Std: %0.16f | EMax: %0.16f" % (np.mean(acsums), np.std(acsums), np.max(acsums)))
+    print("Numpy solver | MAE: %0.16f MAE | Std: %0.16f | EMax: %0.16f" % (np.mean(anpsums), np.std(anpsums), np.max(anpsums)))
 
 class Unittest(unittest.TestCase):
 
@@ -74,40 +111,18 @@ class Unittest(unittest.TestCase):
     def setUpClass():
         pass
 
+
     def test_cases_uniform(self):
         return
-
-        N = 100000
-        rng = np.random.default_rng(5098359162415)
-
-
-        polys = rng.uniform(-1e5, 1e5, (N, 4))
-        csums, npsums = [], []
-        for i, A in enumerate(polys):
-            croots, csum = cubic_solve(A)
-            nproots, npsum = numpy_solve(A)
-                   
-            assert np.allclose(nproots, croots), \
-               "%i:th failed for polynom %s | Out: %s | Ans: %s" % (i, str(A), str(croots), str(nproots))
-
-            csums.extend(csum)
-            npsums.extend(npsum)
-
-        acsums = np.abs(csums)
-        anpsums = np.abs(npsums)
-        print("Uniform results:")
-        print("Cubic solver | MAE: %0.16f MAE | Std: %0.16f | EMax: %0.16f" % (np.mean(acsums), np.std(acsums), np.max(acsums)))
-        print("Numpy solver | MAE: %0.16f MAE | Std: %0.16f | EMax: %0.16f" % (np.mean(anpsums), np.std(anpsums), np.max(anpsums)))
+        verif_cbrt_solver_uniform(cubic_qbc_solve)
         
     
     def test_cmp_algos_max_1e5(self):
-
         N = int(1e6)
         N_runs = 3
         run_algo_comparison(1e5, N, N_runs)
         
     def test_cmp_algos_max_1e0(self):
-
         N = int(1e6)
         N_runs = 3
         run_algo_comparison(1e0, N, N_runs)
