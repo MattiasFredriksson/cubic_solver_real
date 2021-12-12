@@ -2,15 +2,23 @@
 
 C++ implementation for computing real roots of a cubic or quadratic equation (3rd or 2nd order polynomial). [Src code](https://github.com/MattiasFredriksson/cubic_solver_real/blob/master/Cubic/cubic_lib/src/cubic.cpp) contains a "closed form" solver and the numerical root finding algorithm "QBC" (see [W. Kahan notes](https://people.eecs.berkeley.edu/~wkahan/Math128/Cubic.pdf)) based on [Newton's method](https://en.wikipedia.org/wiki/Newton%27s_method). The closed form implementation utilizes both [Cardano's method](https://en.wikipedia.org/wiki/Cubic_equation#Cardano's_method) and the trigonometric method. Implementation of the closed form solver is loosely based on https://github.com/tatwood/solvecubic but adapted to reduce MAE (mean absolute error) and runtime for computing roots in 64-bit precision. 
 
+
+## Performance
+
+Execution time averaged over 1e6 calls for coefficients drawn from a uniform distribution (time for drawing coefficients is included).
+
+Algo. | Average time (ns)
+--- | --- 
+Cubic | 198
+QBC |  282
+
 ## Comparison to Numpy.roots()
 
 Tests consist of 1E6 polynomial functions with coefficients sampled from a uniform distribution with fixed seed. Each test is repeated three times and statistics is computed by evaluating both algorithms on the same coefficients. Outcome will be hardware/software dependent.
 
 Absolute error is computed as e = |f(x_r)| where f(x) is the polynomial function and x_r is any real root computed for f(x) = 0.
 
-### Cubic equation
-
-#### Coefficients uniformly drawn in the range [1e-0, 1e0)
+### Coefficients uniformly drawn in the range [1e-0, 1e0)
 
 Algo. | Test No. | MAE | Std | Max 
 --- | --- | --- | --- | --- 
@@ -25,7 +33,7 @@ QBC | 2 | 0.0000000008438846 | 0.0000010087043156 | 0.0012081484789055
 Numpy | 2 |0.0000000018860261 | 0.0000022526918885 | 0.002698101055433
 
 
-#### Coefficients uniformly drawn in the range [1e-5, 1e5)
+### Coefficients uniformly drawn in the range [1e-5, 1e5)
 
 Algo. | Test No. | MAE | Std | Max 
 --- | --- | --- | --- | --- 
