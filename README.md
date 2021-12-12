@@ -5,7 +5,7 @@ C++ implementation for computing real roots of a cubic or quadratic equation (3r
 
 ## Performance
 
-Execution time averaged over 1e6 calls for coefficients drawn from a uniform distribution (time for drawing coefficients is included).
+Execution time averaged over 1e6 calls for generating coefficients drawn from a uniform distribution and solving the cubic equation.
 
 Algo. | Average time (ns)
 --- | --- 
