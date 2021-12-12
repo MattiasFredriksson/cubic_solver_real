@@ -54,7 +54,7 @@ template float cubic(float a, float b, float c, float d, float x);
 * Implementation is based on https://people.csail.mit.edu/bkph/articles/Quadratics.pdf.
 */
 template<typename FP>
-int quadratic_roots(FP a, FP b, FP c, FP* xout) {
+int quadratic_roots(FP a, FP b, FP c, FP* xroots) {
 	using namespace std;
 	constexpr FP EPSILON = is_same<float, typename remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
 
@@ -63,7 +63,7 @@ int quadratic_roots(FP a, FP b, FP c, FP* xout) {
 		/* Linear equation */
 		if (abs(b) > EPSILON)
 		{
-			*xout = -c / b;
+			*xroots = -c / b;
 			return 1;
 		}
 	}
@@ -86,20 +86,20 @@ int quadratic_roots(FP a, FP b, FP c, FP* xout) {
 			FP c2 = (FP)2.0 * c;
 			q = sqrt(q);
 			if (b < (FP)0.0) {
-				xout[0] = c2 / (q - b);
-				xout[1] = (q - b) * (FP)0.5;
+				xroots[0] = c2 / (q - b);
+				xroots[1] = (q - b) * (FP)0.5;
 			}
 			else {
-				xout[0] = (-b - q) * (FP)0.5;
-				xout[1] = c2 / (-q - b);
+				xroots[0] = (-b - q) * (FP)0.5;
+				xroots[1] = c2 / (-q - b);
 			}
 			return 2;
 		}
 	}
 	return 0;
 }
-template int quadratic_roots(double a, double b, double c, double* xout);
-template int quadratic_roots(float a, float b, float c, float* xout);
+template int quadratic_roots(double a, double b, double c, double* xroots);
+template int quadratic_roots(float a, float b, float c, float* xroots);
 
 /**
  * Implementation uses both the trignometric and Cardano's method method for solving cubic equations.
@@ -110,7 +110,7 @@ template int quadratic_roots(float a, float b, float c, float* xout);
  * @copyright unlicense / public domain
  ****************************************************************************/
 template<typename FP>
-int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
+int cubic_roots(FP a, FP b, FP c, FP d, FP* xroots)
 {
 	using namespace std;
 	constexpr FP PI = (FP)3.141592653589793238462643383279502884197169399375105820974944592307816406286;
@@ -125,9 +125,9 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 	if (abs(d) < EPSILON)
 	{
 		/* First solution is x = 0 */
-		*xout = zero;
+		*xroots = zero;
 		n = 1;
-		++xout;
+		++xroots;
 		/* Divide all terms by x, converting to quadratic equation */
 		d = c;
 		c = b;
@@ -136,7 +136,7 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 	}
 	if (abs(a) < EPSILON)
 	{
-		return quadratic_roots<FP>(b, c, d, xout) + n;
+		return quadratic_roots<FP>(b, c, d, xroots) + n;
 	}
 	else
 
@@ -157,18 +157,18 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 			n = 3;
 			if (fabs(p) < EPSILON)
 			{
-				xout[0] = -bover3;
-				xout[1] = xout[0];
-				xout[2] = xout[0];
+				xroots[0] = -bover3;
+				xroots[1] = xroots[0];
+				xroots[2] = xroots[0];
 			}
 			else
 			{
 				FP uu = (FP)(-4.0 / 3.0) * p;
 				FP u = sqrt(uu);
 				FP theta = acos((FP)-8.0 * halfq / (u * uu)) * third;
-				xout[0] = u * cos(theta) - bover3;
-				xout[1] = u * cos(theta - PI2over3) - bover3;
-				xout[2] = u * cos(theta + PI2over3) - bover3;
+				xroots[0] = u * cos(theta) - bover3;
+				xroots[1] = u * cos(theta - PI2over3) - bover3;
+				xroots[2] = u * cos(theta + PI2over3) - bover3;
 			}
 		}
 		else
@@ -179,7 +179,7 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 			FP vvv = -y - halfq;
 			FP www = abs(uuu) > abs(vvv) ? uuu : vvv;
 			FP w = copysign(cbrt(abs(www)), www);
-			*xout = w - p / ((FP)3.0 * w) - bover3;
+			*xroots = w - p / ((FP)3.0 * w) - bover3;
 			n = 1;
 			return n;
 		}
@@ -188,8 +188,8 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout)
 
 	return n;
 }
-template int cubic_roots(double a, double b, double c, double d, double* xout);
-template int cubic_roots(float a, float b, float c, float d, float* xout);
+template int cubic_roots(double a, double b, double c, double d, double* xroots);
+template int cubic_roots(float a, float b, float c, float d, float* xroots);
 
 
 /**
@@ -202,7 +202,7 @@ template int cubic_roots(float a, float b, float c, float d, float* xout);
 * Note* implementation only return real roots and checks if the equation is linear.
 */
 template<typename FP>
-inline int qdrtc(FP A, FP B, FP C, FP* xout)
+inline int qdrtc(FP A, FP B, FP C, FP* xroots)
 {
 	constexpr FP EPSILON = std::is_same<float, typename std::remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
 
@@ -211,7 +211,7 @@ inline int qdrtc(FP A, FP B, FP C, FP* xout)
 		/* Linear equation */
 		if (std::abs(B) > EPSILON)
 		{
-			*xout = -C / B;
+			*xroots = -C / B;
 			return 1;
 		}
 		/* Constant*/
@@ -233,12 +233,12 @@ inline int qdrtc(FP A, FP B, FP C, FP* xout)
 		FP r = b + std::copysign(std::sqrt(q), b); /* sqrt(q) * sign(b) as q >= 0 */
 		if (r == (FP)0.0) {
 
-			xout[0] = C / A;
-			xout[1] = -xout[0];
+			xroots[0] = C / A;
+			xroots[1] = -xroots[0];
 		}
 		else {
-			xout[0] = C / r;
-			xout[1] = r / A;
+			xroots[0] = C / r;
+			xroots[1] = r / A;
 		}
 	}
 	return 2;
@@ -266,7 +266,7 @@ inline void qbc_eval(FP X, FP A, FP B, FP C, FP D, FP& Q, FP& Q_p, FP& B1, FP& C
  * Note* implementation only return real roots and checks if the equation is linear.
  */
 template<typename FP>
-int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xout) {
+int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xroots) {
 	using namespace std;
 	constexpr FP EPSILON = is_same<float, typename remove_cv<FP>::type>::value ? FLT_EPSILON : DBL_EPSILON;
 
@@ -277,11 +277,11 @@ int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xout) {
 		A = B;
 		b1 = C;
 		c2 = D;
-		// *xout++ == INFINITY;
+		// *xroots++ == INFINITY;
 	}
 	else if (abs(D) < EPSILON) {
 		/* Convert to a quadratic equation (divide by x) */
-		*xout++ = (FP)0.0;
+		*xroots++ = (FP)0.0;
 		b1 = B;
 		c2 = C;
 		N = 1;
@@ -320,9 +320,9 @@ int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xout) {
 			}
 		}
 		N = 1;
-		*xout++ = X;
+		*xroots++ = X;
 	}
-	return N + qdrtc(A, b1, c2, xout);
+	return N + qdrtc(A, b1, c2, xroots);
 }
-template int cubic_roots_qbc(double a, double b, double c, double d, double* xout);
-template int cubic_roots_qbc(float a, float b, float c, float d, float* xout);
+template int cubic_roots_qbc(double a, double b, double c, double d, double* xroots);
+template int cubic_roots_qbc(float a, float b, float c, float d, float* xroots);

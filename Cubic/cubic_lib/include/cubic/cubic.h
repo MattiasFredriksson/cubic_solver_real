@@ -34,7 +34,7 @@ FP cubic(FP a, FP b, FP c, FP d, FP x);
 *		ax^2 + bx + c = 0
 */
 template<typename FP>
-int quadratic_roots(FP a, FP b, FP c, FP* xout);
+int quadratic_roots(FP a, FP b, FP c, FP* xroots);
 
 /**
  * Compute the real roots for the cubic equation
@@ -42,7 +42,7 @@ int quadratic_roots(FP a, FP b, FP c, FP* xout);
  *		ax^3 + bx^2 + cx + d = 0
  */
 template<typename FP>
-int cubic_roots(FP a, FP b, FP c, FP d, FP* xout);
+int cubic_roots(FP a, FP b, FP c, FP d, FP* xroots);
 
 
 /**
@@ -51,7 +51,7 @@ int cubic_roots(FP a, FP b, FP c, FP d, FP* xout);
 *		ax^2 + bx + c = 0
 */
 template<typename FP>
-int qdrtc(FP A, FP B, FP C, FP* xout);
+int qdrtc(FP A, FP B, FP C, FP* xroots);
 
 /**
  * Compute the real roots for the cubic equation
@@ -59,4 +59,4 @@ int qdrtc(FP A, FP B, FP C, FP* xout);
  *		ax^3 + bx^2 + cx + d = 0
  */
 template<typename FP>
-int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xout);
+int cubic_roots_qbc(FP A, FP B, FP C, FP D, FP* xroots);
