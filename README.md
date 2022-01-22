@@ -18,7 +18,7 @@ Tests consist of 1E6 polynomial functions with coefficients sampled from a unifo
 
 Absolute error is computed as e = |f(x_r)| where f(x) is the polynomial function and x_r is any real root computed for f(x) = 0.
 
-### Coefficients uniformly drawn in the range [1e-0, 1e0)
+### Coefficients uniformly drawn in the range [-1e0, 1e0)
 
 Algo. | Test No. | MAE | Std | Max 
 --- | --- | --- | --- | --- 
